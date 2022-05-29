@@ -5,6 +5,7 @@ pragma solidity ^0.8.0;
 import "../unstoppable/UnstoppableLender.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
+import "hardhat/console.sol";
 /**
  * @title ReceiverUnstoppable
  * @author Damn Vulnerable DeFi (https://damnvulnerabledefi.xyz)
@@ -27,6 +28,7 @@ contract ReceiverUnstoppable {
     }
 
     function executeFlashLoan(uint256 amount) external {
+        // console.log('Trigger');
         require(msg.sender == owner, "Only owner can execute flash loan");
         pool.flashLoan(amount);
     }

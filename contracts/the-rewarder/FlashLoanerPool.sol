@@ -5,6 +5,49 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "../DamnValuableToken.sol";
+import "./TheRewarderPool.sol";
+
+import "hardhat/console.sol";
+
+contract TheRewarderPoolAttacker {
+    address public attacker;
+    DamnValuableToken public damnValuableToken;
+    FlashLoanerPool private flashLoanpool;
+    TheRewarderPool private rewarderPool;
+    RewardToken public rewardToken;
+    AccountingToken public accountingToken;
+
+    constructor (
+        address attackerAddress,
+        address liquidityTokenAddress,
+        address flashLoanPoolAddress,
+        address rewarderPoolAddress,
+        address rewardTokenAddress,
+        address accountingTokenAddress
+    ) {
+        attacker = attackerAddress;
+        damnValuableToken = DamnValuableToken(liquidityTokenAddress);
+        flashLoanpool = FlashLoanerPool(flashLoanPoolAddress);
+        rewarderPool = TheRewarderPool(rewarderPoolAddress);
+        rewardToken = RewardToken(rewardTokenAddress);
+        accountingToken = AccountingToken(accountingTokenAddress);
+    }
+
+    function attack (uint amount) public {
+        console.log('ATACK');
+        flashLoanpool.flashLoan(amount);
+    }
+
+    // Take a flash loan of DVT, deposit to rewarder pool, call distributeRewards and collect reward, withdraw DVT
+    // send reward token to the attacker, return DVT
+
+
+    receive() external payable {}
+
+    // receive
+    // fallback
+}
+
 
 /**
  * @title FlashLoanerPool
@@ -23,6 +66,7 @@ contract FlashLoanerPool is ReentrancyGuard {
     }
 
     function flashLoan(uint256 amount) external nonReentrant {
+        console.log('flashLoan');
         uint256 balanceBefore = liquidityToken.balanceOf(address(this));
         require(amount <= balanceBefore, "Not enough token balance");
 

