@@ -73,17 +73,29 @@ describe('[Challenge] The rewarder', function () {
         // this.rewarderPool = await TheRewarderPoolFactory.deploy(this.liquidityToken.address);
         // this.rewardToken = await RewardTokenFactory.attach(await this.rewarderPool.rewardToken());
         // this.accountingToken = await AccountingTokenFactory.attach(await this.rewarderPool.accToken());
-        const TheRewarderAttackerfactory = await ethers.getContractFactory('TheRewarderPoolAttacker', deployer);
-        const attackerContr = await TheRewarderAttackerfactory.deploy(
+        // const TheRewarderAttackerfactory = await ethers.getContractFactory('TheRewarderPoolAttacker', deployer);
+        // const attackerContr = await TheRewarderAttackerfactory.deploy(
+        //     attacker.address,
+        //     this.liquidityToken.address,
+        //     this.flashLoanPool.address,
+        //     this.rewarderPool.address,
+        //     this.rewardToken.address,
+        //     this.accountingToken.address,
+        // );
+        console.log("================++++++ATACK++++++================")
+        const RewarderAttackerfactory = await ethers.getContractFactory('RewarderAttacker', deployer);
+        const attackerContract = await RewarderAttackerfactory.deploy(
             attacker.address,
             this.liquidityToken.address,
             this.flashLoanPool.address,
             this.rewarderPool.address,
             this.rewardToken.address,
-            this.accountingToken.address,
+            this.accountingToken.address
         );
 
-        await attackerContr.connect(attacker).attack(TOKENS_IN_LENDER_POOL);
+        await ethers.provider.send("evm_increaseTime", [5 * 24 * 60 * 60]); // doesnt work probabl   ly
+        await network.provider.send("evm_mine"); // need???
+        await attackerContract.connect(attacker).attack(TOKENS_IN_LENDER_POOL);
     });
 
     after(async function () {

@@ -4,6 +4,8 @@ pragma solidity ^0.8.0;
 import "../DamnValuableTokenSnapshot.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 
+import "hardhat/console.sol";
+
 /**
  * @title SimpleGovernance
  * @author Damn Vulnerable DeFi (https://damnvulnerabledefi.xyz)
@@ -35,15 +37,20 @@ contract SimpleGovernance {
         actionCounter = 1;
     }
     
-    function queueAction(address receiver, bytes calldata data, uint256 weiAmount) external returns (uint256) {
+    function queueAction(
+        address receiver, bytes 
+        calldata data, // abi.encodedSignature ???
+        uint256 weiAmount) external returns (uint256) {
+        console.log('===========queueAction==========');
+        console.log('_hasEnoughVotes', _hasEnoughVotes(msg.sender));
         require(_hasEnoughVotes(msg.sender), "Not enough votes to propose an action");
         require(receiver != address(this), "Cannot queue actions that affect Governance");
-
+        console.log('Viii');
         uint256 actionId = actionCounter;
 
         GovernanceAction storage actionToQueue = actions[actionId];
         actionToQueue.receiver = receiver;
-        actionToQueue.weiAmount = weiAmount;
+        actionToQueue.weiAmount = weiAmount; // amount?
         actionToQueue.data = data;
         actionToQueue.proposedAt = block.timestamp;
 
@@ -54,6 +61,7 @@ contract SimpleGovernance {
     }
 
     function executeAction(uint256 actionId) external payable {
+        // PASS this SHIT
         require(_canBeExecuted(actionId), "Cannot execute this action");
         
         GovernanceAction storage actionToExecute = actions[actionId];
@@ -78,6 +86,7 @@ contract SimpleGovernance {
      */
     function _canBeExecuted(uint256 actionId) private view returns (bool) {
         GovernanceAction memory actionToExecute = actions[actionId];
+        console.log('AFTER 2 days', actionToExecute.proposedAt >= ACTION_DELAY_IN_SECONDS);
         return (
             actionToExecute.executedAt == 0 &&
             (block.timestamp - actionToExecute.proposedAt >= ACTION_DELAY_IN_SECONDS)
@@ -85,8 +94,10 @@ contract SimpleGovernance {
     }
     
     function _hasEnoughVotes(address account) private view returns (bool) {
+        console.log('check account', account);
         uint256 balance = governanceToken.getBalanceAtLastSnapshot(account);
         uint256 halfTotalSupply = governanceToken.getTotalSupplyAtLastSnapshot() / 2;
+        console.log('balance > halfTotalSupply', balance > halfTotalSupply);
         return balance > halfTotalSupply;
     }
 }

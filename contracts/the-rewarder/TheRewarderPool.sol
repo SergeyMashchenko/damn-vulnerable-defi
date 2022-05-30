@@ -6,6 +6,8 @@ import "./RewardToken.sol";
 import "../DamnValuableToken.sol";
 import "./AccountingToken.sol";
 
+import "hardhat/console.sol";
+
 /**
  * @title TheRewarderPool
  * @author Damn Vulnerable DeFi (https://damnvulnerabledefi.xyz)
@@ -48,7 +50,7 @@ contract TheRewarderPool {
      */
     function deposit(uint256 amountToDeposit) external {
         require(amountToDeposit > 0, "Must deposit tokens");
-        
+        console.log('DEPOSIT');
         accToken.mint(msg.sender, amountToDeposit);
         distributeRewards();
 
@@ -63,9 +65,10 @@ contract TheRewarderPool {
     }
 
     function distributeRewards() public returns (uint256) {
+        console.log('distributeRewards');
         uint256 rewards = 0;
-
         if(isNewRewardsRound()) {
+            // console.log('isNewRewardsRound?', isNewRewardsRound());
             _recordSnapshot();
         }        
         
@@ -74,13 +77,14 @@ contract TheRewarderPool {
 
         if (amountDeposited > 0 && totalDeposits > 0) {
             rewards = (amountDeposited * 100 * 10 ** 18) / totalDeposits;
-
             if(rewards > 0 && !_hasRetrievedReward(msg.sender)) {
+                console.log('VIIIIIIIII');
+
                 rewardToken.mint(msg.sender, rewards);
                 lastRewardTimestamps[msg.sender] = block.timestamp;
             }
         }
-
+        console.log('rewards', rewards);
         return rewards;     
     }
 

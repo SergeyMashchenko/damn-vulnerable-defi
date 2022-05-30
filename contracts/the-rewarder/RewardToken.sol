@@ -11,7 +11,8 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
  * @dev A mintable ERC20 with 2 decimals to issue rewards
  */
 contract RewardToken is ERC20, AccessControl {
-
+    // простой токен
+    // reward for keeping DamnValuableToken deposited in TheRewarderPool.
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
     constructor() ERC20("Reward Token", "RWT") {
@@ -20,6 +21,8 @@ contract RewardToken is ERC20, AccessControl {
     }
 
     function mint(address to, uint256 amount) external {
+        // mint more 
+        // get MINTER_ROLE ??
         require(hasRole(MINTER_ROLE, msg.sender));
         _mint(to, amount);
     }
